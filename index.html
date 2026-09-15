@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>保險建議書利益分析簡報</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'sans-serif'],
+            display: ['"Outfit"', '"Noto Sans TC"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              navy: '#0b192c',
+              slate: '#1e3e62',
+              gold: '#d4af37',
+              goldLight: '#f6e05e',
+              emerald: '#00a86b',
+              emeraldDark: '#056b43',
+              coral: '#e06a3b',
+              cardBg: '#132238'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #08101e;
+      color: #f1f5f9;
+      overflow-x: hidden;
+    }
+    .gradient-gold {
+      background: linear-gradient(135deg, #d4af37 0%, #f6e05e 50%, #b8860b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .gradient-emerald {
+      background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .gradient-blue {
+      background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .glass-card {
+      background: rgba(19, 34, 56, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-highlight {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(19, 34, 56, 0.85) 100%);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+    /* 自訂滾動條 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b192c;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a4365;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #d4af37;
+    }
+    .tab-btn.active {
+      background: #d4af37;
+      color: #0b192c;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3);
+    }
+    .slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      border-radius: 4px;
+      background: #2a4365;
+      outline: none;
+    }
+    .slider-thumb::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #d4af37;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
+      border: 2px solid #ffffff;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-brand-gold selection:text-brand-navy">
+
+  <!-- 頂部導航 -->
+  <header class="sticky top-0 z-50 glass-card border-b border-slate-800/80 px-4 lg:px-8 py-3.5 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-gold to-amber-200 flex items-center justify-center text-brand-navy font-bold text-lg shadow-lg shadow-brand-gold/20">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <div>
+        <h1 class="text-base lg:text-lg font-bold text-white flex items-center gap-2">
+          保險建議書利益分析簡報
+          <span class="text-xs px-2 py-0.5 rounded bg-brand-gold/20 text-brand-gold font-medium border border-brand-gold/30">美元英式分紅</span>
+        </h1>
+        <p class="text-xs text-slate-400">投保年齡：56 歲｜繳費年期：6 年｜基本保額：$10,000 美元</p>
+      </div>
+    </div>
+
+    <!-- 視圖切換標籤 -->
+    <div class="flex items-center space-x-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700/60">
+      <button onclick="switchView('overview')" id="tab-overview" class="tab-btn active px-3.5 py-1.5 rounded-lg text-xs transition duration-200 flex items-center gap-1.5">
+        <i class="fa-solid fa-chart-line"></i><span>圖表總覽</span>
+      </button>
+      <button onclick="switchView('interactive')" id="tab-interactive" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs text-slate-300 hover:text-white transition duration-200 flex items-center gap-1.5">
+        <i class="fa-solid fa-sliders"></i><span>年度互動探索</span>
+      </button>
+      <button onclick="switchView('table')" id="tab-table" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs text-slate-300 hover:text-white transition duration-200 flex items-center gap-1.5">
+        <i class="fa-solid fa-table-list"></i><span>完整數據表 (35年)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 主內容區 -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-8">
+
+    <!-- 方案重點數據總覽卡片 -->
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- 總繳保費 -->
+      <div class="glass-card rounded-2xl p-5 border-l-4 border-l-blue-500 relative overflow-hidden group hover:border-slate-600 transition">
+        <div class="flex justify-between items-start">
+          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">總繳保費（6年累積）</span>
+          <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-receipt"></i>
+          </div>
+        </div>
+        <div class="mt-2 flex items-baseline gap-1">
+          <span class="text-2xl lg:text-3xl font-extrabold font-display text-white">$7,068</span>
+          <span class="text-xs text-slate-400">美元</span>
+        </div>
+        <p class="text-xs text-blue-400/90 mt-2 flex items-center gap-1">
+          <i class="fa-solid fa-check-circle text-[11px]"></i> 折扣後年繳 $1,178 (省 1%)
+        </p>
+      </div>
+
+      <!-- 保本年度 -->
+      <div class="glass-card rounded-2xl p-5 border-l-4 border-l-brand-gold relative overflow-hidden group hover:border-slate-600 transition">
+        <div class="flex justify-between items-start">
+          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">保本點（第 6 年末）</span>
+          <div class="w-7 h-7 rounded-lg bg-brand-gold/10 text-brand-gold flex items-center justify-center text-xs">
+            <i class="fa-solid fa-scale-balanced"></i>
+          </div>
+        </div>
+        <div class="mt-2 flex items-baseline gap-1">
+          <span class="text-2xl lg:text-3xl font-extrabold font-display text-brand-gold">$7,078</span>
+          <span class="text-xs text-slate-400">美元</span>
+        </div>
+        <p class="text-xs text-brand-gold/90 mt-2 flex items-center gap-1">
+          <i class="fa-solid fa-sparkles text-[11px]"></i> 繳費期滿即保本 (100.1%)
+        </p>
+      </div>
+
+      <!-- 退休期 20 年 (75歲) -->
+      <div class="glass-card rounded-2xl p-5 border-l-4 border-l-emerald-500 relative overflow-hidden group hover:border-slate-600 transition">
+        <div class="flex justify-between items-start">
+          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">第 20 年 (75歲) 價值</span>
+          <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+          </div>
+        </div>
+        <div class="mt-2 flex items-baseline gap-1">
+          <span class="text-2xl lg:text-3xl font-extrabold font-display text-emerald-400">$11,217</span>
+          <span class="text-xs text-slate-400">美元</span>
+        </div>
+        <p class="text-xs text-emerald-400/90 mt-2 flex items-center gap-1">
+          <i class="fa-solid fa-shield text-[11px]"></i> 壽險保障達 $20,064 (284%)
+        </p>
+      </div>
+
+      <!-- 傳承期 35 年 (90歲) -->
+      <div class="glass-card rounded-2xl p-5 border-l-4 border-l-amber-500 relative overflow-hidden group hover:border-slate-600 transition">
+        <div class="flex justify-between items-start">
+          <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">第 35 年 (90歲) 價值</span>
+          <div class="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-coins"></i>
+          </div>
+        </div>
+        <div class="mt-2 flex items-baseline gap-1">
+          <span class="text-2xl lg:text-3xl font-extrabold font-display text-amber-400">$18,393</span>
+          <span class="text-xs text-slate-400">美元</span>
+        </div>
+        <p class="text-xs text-amber-400/90 mt-2 flex items-center gap-1">
+          <i class="fa-solid fa-gift text-[11px]"></i> 壽險保障達 $28,656 (405%)
+        </p>
+      </div>
+    </section>
+
+    <!-- 視圖 1: 圖表總覽 (Overview) -->
+    <div id="view-overview" class="space-y-8 block">
+      
+      <!-- 趨勢圖表卡片 -->
+      <div class="glass-card rounded-3xl p-6 lg:p-8 space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-chart-area text-brand-gold"></i>
+              保單三大核心指標增長軌跡
+            </h2>
+            <p class="text-sm text-slate-400 mt-1">展示「累積所繳保費」、「當年度末壽險保障」與「可能領取解約金總和」35年全期對比</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-4 text-xs">
+            <span class="flex items-center gap-1.5 text-blue-400">
+              <span class="w-3 h-3 rounded-full bg-blue-500 inline-block"></span> 1. 折扣後累積所繳保險費
+            </span>
+            <span class="flex items-center gap-1.5 text-brand-gold">
+              <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span> 2. 當年度末壽險保障
+            </span>
+            <span class="flex items-center gap-1.5 text-emerald-400">
+              <span class="w-3 h-3 rounded-full bg-emerald-400 inline-block"></span> 3. 當年度末可能領取解約金總和
+            </span>
+          </div>
+        </div>
+
+        <!-- Chart 容器 -->
+        <div class="relative h-[380px] w-full">
+          <canvas id="growthChart"></canvas>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-800">
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex items-start gap-3">
+            <div class="p-2.5 rounded-lg bg-blue-500/10 text-blue-400 text-lg">
+              <i class="fa-solid fa-lock"></i>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-white">保費鎖定（1~6年）</h4>
+              <p class="text-xs text-slate-400 mt-0.5">總成本僅 $7,068 美元，第 6 年後不再繳費，本金固定不再增加。</p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex items-start gap-3">
+            <div class="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-lg">
+              <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-white">資產穩健倍增（解約金）</h4>
+              <p class="text-xs text-slate-400 mt-0.5">第 6 年末即達 $7,078 保本，第 20 年 $11,217 (1.59倍)，第 35 年 $18,393 (2.60倍)。</p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex items-start gap-3">
+            <div class="p-2.5 rounded-lg bg-amber-500/10 text-amber-400 text-lg">
+              <i class="fa-solid fa-shield-heart"></i>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-white">高額壽險傳承槓桿</h4>
+              <p class="text-xs text-slate-400 mt-0.5">壽險保障從 $10,000 隨分紅累積至 90 歲時達 $28,656 美元，為總繳保費的 4.05 倍。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 階段性里程碑分析 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-blue-500 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold px-2.5 py-1 rounded bg-blue-500/20 text-blue-300">階段一</span>
+            <span class="text-xs text-slate-400">年度 1~6（年齡 56~61）</span>
+          </div>
+          <h3 class="text-lg font-bold text-white">累積投入與快速保本</h3>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li class="flex items-center justify-between py-1 border-b border-slate-800">
+              <span class="text-slate-400">總累繳保費</span>
+              <span class="font-bold text-white font-display">$7,068</span>
+            </li>
+            <li class="flex items-center justify-between py-1 border-b border-slate-800">
+              <span class="text-slate-400">第 6 年末壽險保障</span>
+              <span class="font-bold text-brand-gold font-display">$14,665</span>
+            </li>
+            <li class="flex items-center justify-between py-1">
+              <span class="text-slate-400">第 6 年末解約金總和</span>
+              <span class="font-bold text-emerald-400 font-display">$7,078 <span class="text-[10px] text-emerald-300">(保本 100.1%)</span></span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-emerald-500 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300">階段二</span>
+            <span class="text-xs text-slate-400">年度 7~20（年齡 62~75）</span>
+          </div>
+          <h3 class="text-lg font-bold text-white">複利增值與退休金庫</h3>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li class="flex items-center justify-between py-1 border-b border-slate-800">
+              <span class="text-slate-400">第 10 年末 (65歲) 解約金</span>
+              <span class="font-bold text-white font-display">$8,016 <span class="text-[10px] text-slate-400">(113%)</span></span>
+            </li>
+            <li class="flex items-center justify-between py-1 border-b border-slate-800">
+              <span class="text-slate-400">第 20 年末 (75歲) 解約金</span>
+              <span class="font-bold text-emerald-400 font-display">$11,217 <span class="text-[10px] text-emerald-300">(159%)</span></span>
+            </li>
+            <li class="flex items-center justify-between py-1">
+              <span class="text-slate-400">第 20 年末壽險保障</span>
+              <span class="font-bold text-brand-gold font-display">$20,064 <span class="text-[10px] text-amber-300">(284%)</span></span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-amber-500 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold px-2.5 py-1 rounded bg-amber-500/20 text-amber-300">階段三</span>
+            <span class="text-xs text-slate-400">年度 21~35（年齡 76~90）</span>
+          </div>
+          <h3 class="text-lg font-bold text-white">傳承倍增與資產守護</h3>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li class="flex items-center justify-between py-1 border-b border-slate-800">
+              <span class="text-slate-400">第 30 年末 (85歲) 解約金</span>
+              <span class="font-bold text-white font-display">$15,617 <span class="text-[10px] text-slate-400">(221%)</span></span>
+            </li>
+            <li class="flex items-center justify-between py-1 border-b border-slate-800">
+              <span class="text-slate-400">第 35 年末 (90歲) 解約金</span>
+              <span class="font-bold text-emerald-400 font-display">$18,393 <span class="text-[10px] text-emerald-300">(260%)</span></span>
+            </li>
+            <li class="flex items-center justify-between py-1">
+              <span class="text-slate-400">第 35 年末壽險保障</span>
+              <span class="font-bold text-brand-gold font-display">$28,656 <span class="text-[10px] text-amber-300">(405%)</span></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 視圖 2: 年度互動探索 (Interactive Slider) -->
+    <div id="view-interactive" class="space-y-6 hidden">
+      <div class="glass-card rounded-3xl p-6 lg:p-10 space-y-8">
+        <div class="text-center max-w-2xl mx-auto">
+          <h2 class="text-2xl font-bold text-white">保單年度效益即時試算探索</h2>
+          <p class="text-sm text-slate-400 mt-2">滑動下方時間軸，即時查看任意保單年度與年齡對應的三大核心數據與效益指標</p>
+        </div>
+
+        <!-- 滑桿區塊 -->
+        <div class="max-w-3xl mx-auto space-y-4 bg-slate-900/80 p-6 rounded-2xl border border-slate-800">
+          <div class="flex justify-between items-center text-sm font-semibold">
+            <span class="text-slate-400">第 1 年 (56歲)</span>
+            <span class="text-brand-gold text-base font-bold flex items-center gap-2">
+              <i class="fa-solid fa-calendar-check"></i>
+              保單年度：<span id="sliderYearLabel" class="text-xl font-display font-extrabold text-white">6</span> 年
+              （年齡：<span id="sliderAgeLabel" class="text-xl font-display font-extrabold text-white">61</span> 歲）
+            </span>
+            <span class="text-slate-400">第 35 年 (90歲)</span>
+          </div>
+
+          <input type="range" id="yearSlider" min="1" max="35" value="6" step="1" 
+                 class="w-full slider-thumb cursor-pointer" oninput="updateInteractiveView(this.value)">
+
+          <div class="flex justify-between text-[11px] text-slate-500 px-1">
+            <span>投保 (56歲)</span>
+            <span>期滿保本 (61歲)</span>
+            <span>退休 (65歲)</span>
+            <span>樂齡 (75歲)</span>
+            <span>高齡 (85歲)</span>
+            <span>傳承 (90歲)</span>
+          </div>
+        </div>
+
+        <!-- 3 個核心欄位動態大卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- 欄位 1: 折扣後的累積所繳保險費 -->
+          <div class="glass-card rounded-2xl p-6 border border-blue-500/30 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+            <div class="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-1 flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-wallet"></i> 1. 折扣後的累積所繳保險費
+            </div>
+            <div class="text-3xl lg:text-4xl font-black font-display text-white mt-3" id="dyn-premium">$7,068</div>
+            <div class="text-xs text-slate-400 mt-2" id="dyn-premium-desc">累積總投入成本（年繳 $1,178）</div>
+          </div>
+
+          <!-- 欄位 2: 當年度末壽險保障 -->
+          <div class="glass-card-highlight rounded-2xl p-6 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-brand-gold"></div>
+            <div class="text-xs font-semibold text-brand-gold uppercase tracking-wider mb-1 flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-shield-halved"></i> 2. 當年度末壽險保障
+            </div>
+            <div class="text-3xl lg:text-4xl font-black font-display text-brand-gold mt-3" id="dyn-coverage">$14,665</div>
+            <div class="text-xs text-amber-200/80 mt-2" id="dyn-coverage-rate">為總繳保費的 <span class="font-bold text-white">207.5%</span>（保障槓桿）</div>
+          </div>
+
+          <!-- 欄位 3: 當年度末可能領取解約金總和 -->
+          <div class="glass-card rounded-2xl p-6 border border-emerald-500/30 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
+            <div class="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1 flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-hand-holding-dollar"></i> 3. 當年度末可能領取解約金總和
+            </div>
+            <div class="text-3xl lg:text-4xl font-black font-display text-emerald-400 mt-3" id="dyn-surrender">$7,078</div>
+            <div class="text-xs text-emerald-300 mt-2" id="dyn-surrender-rate">保本率 <span class="font-bold text-white">100.1%</span>（淨增值 +$10）</div>
+          </div>
+        </div>
+
+        <!-- 該年度詳細說明條 -->
+        <div class="bg-slate-900/60 rounded-xl p-4 border border-slate-800 text-sm text-slate-300 flex items-center gap-3" id="dyn-year-summary">
+          <i class="fa-solid fa-circle-info text-brand-gold text-lg flex-shrink-0"></i>
+          <span>第 6 年度（61歲）為繳費期滿首年，累計投入保費 $7,068 美元，此時解約金達 $7,078 美元已正式保本，壽險保障達 $14,665 美元。</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 視圖 3: 完整數據表 (Table) -->
+    <div id="view-table" class="space-y-6 hidden">
+      <div class="glass-card rounded-3xl p-6 lg:p-8 space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-table text-brand-gold"></i>
+              保險建議書利益分析 35 年完整數據表
+            </h2>
+            <p class="text-sm text-slate-400 mt-1">包含使用者指定三大核心欄位（單位：美元）</p>
+          </div>
+          <div class="text-xs text-slate-400 flex items-center gap-2">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span> 標註保本點與關鍵年度
+          </div>
+        </div>
+
+        <!-- 表格 -->
+        <div class="overflow-x-auto rounded-2xl border border-slate-800">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-900/90 text-slate-300 font-semibold border-b border-slate-700/80">
+                <th class="py-3.5 px-4 text-center">年度</th>
+                <th class="py-3.5 px-4 text-center">年齡</th>
+                <th class="py-3.5 px-6 text-right text-blue-300">
+                  <i class="fa-solid fa-wallet text-xs mr-1"></i> 1. 折扣後的累積所繳保險費
+                </th>
+                <th class="py-3.5 px-6 text-right text-amber-300">
+                  <i class="fa-solid fa-shield-halved text-xs mr-1"></i> 2. 當年度末壽險保障
+                </th>
+                <th class="py-3.5 px-6 text-right text-emerald-300">
+                  <i class="fa-solid fa-hand-holding-dollar text-xs mr-1"></i> 3. 當年度末可能領取解約金總和
+                </th>
+                <th class="py-3.5 px-4 text-center text-slate-400">保本/增值效益</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody" class="divide-y divide-slate-800/60 text-slate-300 font-mono text-xs lg:text-sm">
+              <!-- JS 動態插入所有 35 筆資料 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部聲明與公式備註 -->
+    <footer class="text-center text-xs text-slate-500 space-y-2 pt-4 pb-8 border-t border-slate-800/60">
+      <p>※ 本簡報係依據保險建議書官方數據精確計算製作，本商品為英式分紅保單，分紅保額及解約金包含假設中分紅預估值。</p>
+      <p>※ 數據欄位包含：1. 折扣後累積所繳保費 ｜ 2. 當年度末壽險保障 (A+D+E) ｜ 3. 當年度末可能領取解約金總和 (B+G+H)</p>
+    </footer>
+
+  </main>
+
+  <!-- 數據資料與邏輯腳本 -->
+  <script>
+    // 35 年完整數據陣列（精確自建議書截圖 1, 2, 3 提煉）
+    const proposalData = [
+      { year: 1,  age: 56, premium: 1178, coverage: 10000, surrender: 450 },
+      { year: 2,  age: 57, premium: 2356, coverage: 10000, surrender: 1170 },
+      { year: 3,  age: 58, premium: 3534, coverage: 10100, surrender: 1974 },
+      { year: 4,  age: 59, premium: 4712, coverage: 10201, surrender: 2970 },
+      { year: 5,  age: 60, premium: 5890, coverage: 10303, surrender: 4329 },
+      { year: 6,  age: 61, premium: 7068, coverage: 14665, surrender: 7078 },
+      { year: 7,  age: 62, premium: 7068, coverage: 14987, surrender: 7299 },
+      { year: 8,  age: 63, premium: 7068, coverage: 15311, surrender: 7539 },
+      { year: 9,  age: 64, premium: 7068, coverage: 15635, surrender: 7772 },
+      { year: 10, age: 65, premium: 7068, coverage: 15963, surrender: 8016 },
+      { year: 11, age: 66, premium: 7068, coverage: 16335, surrender: 8270 },
+      { year: 12, age: 67, premium: 7068, coverage: 16663, surrender: 8543 },
+      { year: 13, age: 68, premium: 7068, coverage: 16993, surrender: 8816 },
+      { year: 14, age: 69, premium: 7068, coverage: 17324, surrender: 9102 },
+      { year: 15, age: 70, premium: 7068, coverage: 17660, surrender: 9392 },
+      { year: 16, age: 71, premium: 7068, coverage: 18677, surrender: 9724 },
+      { year: 17, age: 72, premium: 7068, coverage: 19019, surrender: 10073 },
+      { year: 18, age: 73, premium: 7068, coverage: 19362, surrender: 10442 },
+      { year: 19, age: 74, premium: 7068, coverage: 19712, surrender: 10823 },
+      { year: 20, age: 75, premium: 7068, coverage: 20064, surrender: 11217 },
+      { year: 21, age: 76, premium: 7068, coverage: 21321, surrender: 11616 },
+      { year: 22, age: 77, premium: 7068, coverage: 21685, surrender: 12028 },
+      { year: 23, age: 78, premium: 7068, coverage: 22051, surrender: 12438 },
+      { year: 24, age: 79, premium: 7068, coverage: 22423, surrender: 12858 },
+      { year: 25, age: 80, premium: 7068, coverage: 22802, surrender: 13290 },
+      { year: 26, age: 81, premium: 7068, coverage: 24080, surrender: 13732 },
+      { year: 27, age: 82, premium: 7068, coverage: 24467, surrender: 14186 },
+      { year: 28, age: 83, premium: 7068, coverage: 24862, surrender: 14651 },
+      { year: 29, age: 84, premium: 7068, coverage: 25258, surrender: 15127 },
+      { year: 30, age: 85, premium: 7068, coverage: 25661, surrender: 15617 },
+      { year: 31, age: 86, premium: 7068, coverage: 26968, surrender: 16119 },
+      { year: 32, age: 87, premium: 7068, coverage: 27378, surrender: 16657 },
+      { year: 33, age: 88, premium: 7068, coverage: 27799, surrender: 17215 },
+      { year: 34, age: 89, premium: 7068, coverage: 28223, surrender: 17793 },
+      { year: 35, age: 90, premium: 7068, coverage: 28656, surrender: 18393 }
+    ];
+
+    // 格式化千分位
+    function formatNumber(num) {
+      return num.toLocaleString('en-US');
+    }
+
+    // 切換視圖
+    function switchView(viewName) {
+      document.getElementById('view-overview').classList.add('hidden');
+      document.getElementById('view-interactive').classList.add('hidden');
+      document.getElementById('view-table').classList.add('hidden');
+
+      document.getElementById('tab-overview').classList.remove('active');
+      document.getElementById('tab-interactive').classList.remove('active');
+      document.getElementById('tab-table').classList.remove('active');
+
+      document.getElementById('view-' + viewName).classList.remove('hidden');
+      document.getElementById('tab-' + viewName).classList.add('active');
+
+      if (viewName === 'overview' && window.myChart) {
+        window.myChart.resize();
+      }
+    }
+
+    // 填入表格資料
+    function populateTable() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      proposalData.forEach(row => {
+        const tr = document.createElement('tr');
+        const isKeyYear = [6, 10, 20, 30, 35].includes(row.year);
+        const isBreakEven = row.year === 6;
+
+        let rowClass = 'hover:bg-slate-800/50 transition';
+        if (isBreakEven) {
+          rowClass += ' bg-amber-500/10 font-bold';
+        } else if (isKeyYear) {
+          rowClass += ' bg-slate-900/40';
+        }
+
+        const breakEvenRate = ((row.surrender / row.premium) * 100).toFixed(1);
+        let statusBadge = '';
+        if (row.year < 6) {
+          statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] bg-slate-800 text-slate-400">繳費中 (${breakEvenRate}%)</span>`;
+        } else if (row.year === 6) {
+          statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] bg-brand-gold text-brand-navy font-bold shadow">★ 滿期保本 (${breakEvenRate}%)</span>`;
+        } else {
+          statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">+${(breakEvenRate - 100).toFixed(1)}% (${breakEvenRate}%)</span>`;
+        }
+
+        tr.className = rowClass;
+        tr.innerHTML = `
+          <td class="py-3 px-4 text-center text-slate-300 font-bold">${row.year}</td>
+          <td class="py-3 px-4 text-center text-slate-400">${row.age} 歲</td>
+          <td class="py-3 px-6 text-right font-medium text-blue-300 font-display">$${formatNumber(row.premium)}</td>
+          <td class="py-3 px-6 text-right font-medium text-amber-300 font-display">$${formatNumber(row.coverage)}</td>
+          <td class="py-3 px-6 text-right font-medium text-emerald-300 font-display">$${formatNumber(row.surrender)}</td>
+          <td class="py-3 px-4 text-center">${statusBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 更新互動視圖
+    function updateInteractiveView(yearVal) {
+      const year = parseInt(yearVal, 10);
+      const data = proposalData.find(d => d.year === year);
+      if (!data) return;
+
+      document.getElementById('sliderYearLabel').innerText = data.year;
+      document.getElementById('sliderAgeLabel').innerText = data.age;
+
+      document.getElementById('dyn-premium').innerText = '$' + formatNumber(data.premium);
+      document.getElementById('dyn-coverage').innerText = '$' + formatNumber(data.coverage);
+      document.getElementById('dyn-surrender').innerText = '$' + formatNumber(data.surrender);
+
+      const coverageRatio = ((data.coverage / data.premium) * 100).toFixed(1);
+      const surrenderRatio = ((data.surrender / data.premium) * 100).toFixed(1);
+      const netGain = data.surrender - data.premium;
+
+      document.getElementById('dyn-coverage-rate').innerHTML = `為總繳保費的 <span class="font-bold text-white">${coverageRatio}%</span>（保障槓桿）`;
+
+      if (data.year < 6) {
+        document.getElementById('dyn-premium-desc').innerText = `繳費第 ${data.year} 年（年繳 $1,178）`;
+        document.getElementById('dyn-surrender-rate').innerHTML = `解約金佔累繳保費 <span class="font-bold text-slate-300">${surrenderRatio}%</span>（累積準備期）`;
+        document.getElementById('dyn-year-summary').innerHTML = `
+          <i class="fa-solid fa-circle-info text-blue-400 text-lg flex-shrink-0"></i>
+          <span>第 ${data.year} 年度（${data.age}歲）：處於保費累積繳費期，當期已累積繳納 $${formatNumber(data.premium)} 美元，享有基本壽險保障 $${formatNumber(data.coverage)} 美元。</span>
+        `;
+      } else if (data.year === 6) {
+        document.getElementById('dyn-premium-desc').innerText = `繳費期滿！總累繳 $7,068`;
+        document.getElementById('dyn-surrender-rate').innerHTML = `保本率 <span class="font-bold text-brand-gold">${surrenderRatio}%</span>（正式保本）`;
+        document.getElementById('dyn-year-summary').innerHTML = `
+          <i class="fa-solid fa-trophy text-brand-gold text-lg flex-shrink-0"></i>
+          <span>第 6 年度（61歲）：<strong>繳費期滿首年正式達成 100.1% 保本</strong>！解約金達 $7,078 美元，壽險保障大幅跳升至 $14,665 美元（保障倍數 2.07 倍）。</span>
+        `;
+      } else {
+        document.getElementById('dyn-premium-desc').innerText = `本金已固定鎖定為 $7,068`;
+        const netSign = netGain >= 0 ? `+$${formatNumber(netGain)}` : `-$${formatNumber(Math.abs(netGain))}`;
+        document.getElementById('dyn-surrender-rate').innerHTML = `保本增值率 <span class="font-bold text-emerald-400">${surrenderRatio}%</span>（淨增值 ${netSign}）`;
+        document.getElementById('dyn-year-summary').innerHTML = `
+          <i class="fa-solid fa-chart-line text-emerald-400 text-lg flex-shrink-0"></i>
+          <span>第 ${data.year} 年度（${data.age}歲）：總成本固定為 $7,068 美元。若此時解約可領回 <strong>$${formatNumber(data.surrender)} 美元</strong>（增值率 ${surrenderRatio}%），當年度壽險保障達 <strong>$${formatNumber(data.coverage)} 美元</strong>。</span>
+        `;
+      }
+    }
+
+    // 初始化 Chart.js 圖表
+    function initChart() {
+      const ctx = document.getElementById('growthChart').getContext('2d');
+      const labels = proposalData.map(d => `第${d.year}年(${d.age}歲)`);
+      const premiumData = proposalData.map(d => d.premium);
+      const coverageData = proposalData.map(d => d.coverage);
+      const surrenderData = proposalData.map(d => d.surrender);
+
+      window.myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: '1. 折扣後累積所繳保費',
+              data: premiumData,
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              pointRadius: 2,
+              pointHoverRadius: 5,
+              tension: 0.1,
+              fill: false
+            },
+            {
+              label: '2. 當年度末壽險保障',
+              data: coverageData,
+              borderColor: '#d4af37',
+              backgroundColor: 'rgba(212, 175, 55, 0.15)',
+              borderWidth: 3,
+              pointRadius: 3,
+              pointHoverRadius: 6,
+              pointBackgroundColor: '#f6e05e',
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: '3. 當年度末可能領取解約金總和',
+              data: surrenderData,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              borderWidth: 3,
+              pointRadius: 3,
+              pointHoverRadius: 6,
+              pointBackgroundColor: '#34d399',
+              tension: 0.3,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          plugins: {
+            legend: {
+              display: false // 已在頂部自訂
+            },
+            tooltip: {
+              backgroundColor: 'rgba(11, 25, 44, 0.95)',
+              titleColor: '#f6e05e',
+              bodyColor: '#f1f5f9',
+              borderColor: 'rgba(212, 175, 55, 0.4)',
+              borderWidth: 1,
+              padding: 12,
+              boxPadding: 6,
+              usePointStyle: true,
+              callbacks: {
+                label: function(context) {
+                  return ` ${context.dataset.label}: $${formatNumber(context.parsed.y)} 美元`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.04)'
+              },
+              ticks: {
+                color: '#94a3b8',
+                maxTicksLimit: 12,
+                font: {
+                  size: 11
+                }
+              }
+            },
+            y: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.07)'
+              },
+              ticks: {
+                color: '#94a3b8',
+                font: {
+                  size: 11
+                },
+                callback: function(value) {
+                  return '$' + formatNumber(value);
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // 頁面加載完成初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      populateTable();
+      initChart();
+      updateInteractiveView(6);
+    });
+  </script>
+</body>
+</html>
